@@ -112,14 +112,14 @@ class Mul(Function):
 class Sigmoid(Function):
     @staticmethod
     def forward(ctx: Context, t1: Tensor) -> Tensor:
-        sig = t1.f.sigmoid_map(t1)
-        ctx.save_for_backward(sig)
-        return sig
+        sigmoid = t1.f.sigmoid_map(t1)
+        ctx.save_for_backward(sigmoid)
+        return sigmoid
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        (sig,) = ctx.saved_values
-        return sig * (tensor(1) - sig) * grad_output
+        (sigmoid,) = ctx.saved_values
+        return sigmoid * (tensor(1) - sigmoid) * grad_output
 
 
 class ReLU(Function):
@@ -186,7 +186,7 @@ class LT(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        return (0.0, 0.0)
+        return grad_output.zeros(), grad_output.zeros()
 
 
 class EQ(Function):
@@ -196,7 +196,7 @@ class EQ(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        return (0.0, 0.0)
+        return grad_output.zeros(), grad_output.zeros()
 
 
 class IsClose(Function):

@@ -53,12 +53,12 @@ def eq(x, y):
 def max(x, y):
     return x if x > y else y
 
-def abs(x):
-    return x if x >= 0 else -x
 
 eps = 1e-6
 
 def is_close(x, y):
+    def abs(x):
+        return x if x >= 0 else -x
     return abs(x - y) < eps
 
 def sigmoid(x):

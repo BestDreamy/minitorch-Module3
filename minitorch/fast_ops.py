@@ -259,14 +259,20 @@ def tensor_reduce(
         a_strides: Strides,
         reduce_dim: int,
     ) -> None:
+        """
+        [     ]       []
+        [     ]  -->  []
+        [     ]       []
+           a         out
+        """
 
         out_index = [0] * len(out_shape)
         for i in prange(len(out)):
             to_index(i, out_shape, out_index)
             out_pos = index_to_position(out_index, out_strides)
 
-            a_index = out_index.copy()
             for j in range(a_shape[reduce_dim]):
+                a_index = out_index.copy()
                 a_index[reduce_dim] = j
                 a_pos = index_to_position(a_index, a_strides)
                 out[out_pos] = fn(out[out_pos], a_storage[a_pos])
@@ -317,11 +323,29 @@ def _tensor_matrix_multiply(
         None : Fills in `out`
 
     """
+    # assert(len(out_shape) == 3)
+    
+    assert(a_shape[-1] == b_shape[-2])
+
     a_batch_stride = a_strides[0] if a_shape[0] > 1 else 0
     b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
 
-    # TODO: Implement for Task 3.2.
-    raise NotImplementedError("Need to implement for Task 3.2")
+    K = a_shape[-1] # must be equal to b_shape[-2]
+    B, R, C = out_shape[-3:]
+
+    for b in prange(B):
+        for r in range(R):
+            for c in range(C):
+                ret = 0.0
+                a_ord = b * a_batch_stride + r * a_strides[-2]
+                b_ord = b * b_batch_stride + c * b_strides[-1]
+
+                for _ in range(K):
+                    ret += a_storage[a_ord] * b_storage[b_ord]
+                    a_ord += a_strides[-1]
+                    b_ord += b_strides[-2]
+                out_ord = b * out_strides[-3] + r * out_strides[-2] + c * out_strides[-1]
+                out[out_ord] = ret
 
 
 tensor_matrix_multiply = njit(_tensor_matrix_multiply, parallel=True)
