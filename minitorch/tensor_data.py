@@ -75,8 +75,8 @@ def broadcast_index(
 ) -> None:
     """
     Convert a `big_index` into `big_shape` to a smaller `out_index`
-    into `shape` following broadcasting rules. In this case
-    it may be larger or with more dimensions than the `shape`
+    into `shape` following broadcasting rules. 
+    In this case it may be larger or with more dimensions than the `shape`
     given. Additional dimensions may need to be mapped to 0 or
     removed.
 
@@ -91,8 +91,8 @@ def broadcast_index(
     """
     for i in range(len(shape)):
         """
-        (3, 2, 5)
-           (2, 5)
+        big_shape (3, 2, 5)
+            shape    (2, 5)
         """
         offset = len(big_shape) - len(shape)
         out_index[i] = big_index[i + offset] if big_shape[i + offset] == shape[i] else 0
